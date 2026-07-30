@@ -1,12 +1,11 @@
 from pypdf import PdfReader
 from pathlib import Path
 
-
 path = Path("data/documents/ML_u1.pdf")
-reader = PdfReader(path)            # opens the pdf
+reader = PdfReader(path)
 
 total_pages = len(reader.pages)
-print("no of pages:",total_pages)   # there are 25 page in the document
+print("no of pages:",total_pages)
 
 chunks = []
 CHUNK_SIZE = 100
@@ -19,7 +18,7 @@ for page_no, page in enumerate(reader.pages, start = 1):
 
         length = len(page_text)
         i = 0
-        while i + CHUNK_SIZE < length:                    #split the text into 100 characters each chunk
+        while i + CHUNK_SIZE < length:
             j = i + CHUNK_SIZE
             while page_text[j] != " ":
                 j -= 1
@@ -43,10 +42,3 @@ for page_no, page in enumerate(reader.pages, start = 1):
         }
         chunk_id += 1
         chunks.append(chunk)
-
-for chunk in chunks:
-    print(chunk["id"])
-    print(chunk["page"])
-    print(chunk["source"])
-
-    print()
