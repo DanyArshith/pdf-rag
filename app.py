@@ -2,9 +2,10 @@ from pypdf import PdfReader
 from pathlib import Path
 from preprocess import preprocess_pdf
 from embedder import generate_embeddings
-# from vector_store import search
 from model import embedding_model
 from faiss_store import build_index, search
+from prompt import build_pormpt
+from llm import generate_answer
 
 def main():
     path = Path("data/documents/ML_u1.pdf")
@@ -15,11 +16,13 @@ def main():
 
     query = input("Ask a question: ")
     query_embedding = embedding_model.encode(query)
-    results = search(index, query_embedding, chunks, k = 5)
-    for chunk in results:
-        print("-" * 50)
-        print(f"Page: {chunk['page']}")
-        print(chunk["text"])
+    retrieved_chunks = search(index, query_embedding, chunks, k = 20)
+    prompt = build_pormpt(query, retrieved_chunks)
+    answer = generate_answer(prompt)
+
+    print("Answer")
+    print(answer)
+    print()
 
 if __name__ == "__main__":
     main()
