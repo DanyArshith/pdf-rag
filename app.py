@@ -18,10 +18,10 @@ def main():
     query_embedding = embedding_model.encode(query)
     retrieved_chunks = search(index, query_embedding, chunks, k = 20)
     prompt = build_pormpt(query, retrieved_chunks)
-    answer = generate_answer(prompt)
-
+    print()
     print("Answer")
-    print(answer)
+    answer = generate_answer(prompt)
+    # print(answer)
     print()
 
 if __name__ == "__main__":
