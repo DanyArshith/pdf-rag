@@ -1,6 +1,6 @@
 from pypdf import PdfReader
 
-def preprocess_pdf(path, chunk_size):
+def preprocess_pdf(path, chunk_size, overlap):
     reader = PdfReader(path)
     chunks = []
     chunk_id = 0
@@ -16,7 +16,7 @@ def preprocess_pdf(path, chunk_size):
                 j = i + chunk_size
                 while page_text[j] != " ":
                     j -= 1
-
+                
                 text = page_text[i:j]
                 chunk = {
                     "id" : chunk_id,
@@ -26,7 +26,9 @@ def preprocess_pdf(path, chunk_size):
                 }
                 chunk_id += 1
                 chunks.append(chunk)
-                i = j + 1
+                i = j - overlap
+
+                
             last_text = page_text[i:]
             chunk = {
                 "id" : chunk_id,

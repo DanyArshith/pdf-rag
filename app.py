@@ -9,9 +9,10 @@ from llm import generate_answer
 
 def main():
     path = Path("data/documents/ML_u1.pdf")
-    chunks = preprocess_pdf(path, chunk_size=100)
+    chunks = preprocess_pdf(path, chunk_size=300, overlap = 50)
 
     chunks = generate_embeddings(chunks)
+
     index = build_index(chunks)
 
     query = input("Ask a question: ")
