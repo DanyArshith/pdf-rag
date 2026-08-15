@@ -1,4 +1,4 @@
-def build_pormpt(question, chunks):
+def build_prompt(question, chunks):
     context = ""
     for chunk in chunks:
 
