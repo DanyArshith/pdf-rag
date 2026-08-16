@@ -11,6 +11,7 @@ from faiss_store import (
 )
 from prompt import build_prompt
 from llm import generate_answer
+from evaluation import evaluation_data, evaluate_all
 
 def main():
     path = Path("data/documents/ML_u1.pdf")
@@ -30,18 +31,21 @@ def main():
         print("Existing index loaded.")
     
     
-    while True:
-        query = input("Ask a question: ").strip()
-        if query.lower() == "exit":
-            break
+    # while True:
+    #     query = input("Ask a question: ").strip()
+    #     if query.lower() == "exit":
+    #         break
 
-        query_embedding = embedding_model.encode(query)
-        retrieved_chunks = search(index, query_embedding, chunks, k = 5)
-        prompt = build_prompt(query, retrieved_chunks)
+    #     query_embedding = embedding_model.encode(query)
+    #     retrieved_chunks = search(index, query_embedding, chunks, k = 5)
+    #     prompt = build_prompt(query, retrieved_chunks)
 
-        print("\nAnswer:")
-        answer = generate_answer(prompt)
-        print("\n")
+    #     print("\nAnswer:")
+    #     answer = generate_answer(prompt)
+    #     print("\n")
+
+
+        evaluate_all(index, chunks, evaluation_data, k = 5)
 
 
 if __name__ == "__main__":
