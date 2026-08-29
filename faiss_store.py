@@ -46,5 +46,27 @@ def load_index():
 def search(index, query_embedding, chunks, k):
     query_embedding = query_embedding.reshape(1, -1).astype(np.float32)
     distances, indices = index.search(query_embedding, k)
+    results = []
 
-    return [chunks[index] for index in indices[0]]
+    for distance, idx in zip(distances[0], indices[0]):
+        results.append({
+            "chunk": chunks[idx],
+            "distance": float(distance)
+        })
+
+    return results     
+
+def debug_search(index, query_embedding, chunks, k):
+    query_embedding = query_embedding.reshape(1, -1).astype(np.float32)
+
+    distances, indices = index.search(query_embedding, k)
+
+    results = []
+
+    for distance, idx in zip(distances[0], indices[0]):
+        results.append({
+            "distance": float(distance),
+            "chunk": chunks[idx]
+        })
+
+    return results

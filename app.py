@@ -7,45 +7,37 @@ from faiss_store import (
     build_index,
     save_index,
     load_index,
-    search
+    search,
+    debug_search
 )
 from prompt import build_prompt
 from llm import generate_answer
 from evaluation import evaluation_data, evaluate_all
 
 def main():
-    path = Path("data/documents/ML_u1.pdf")
+    path = Path("data/documents/GEN_AI.pdf")
 
-    index, chunks = load_index()
-    if index is None or chunks is None:
-        print("No existing index found.")
-        print("Building index...")
-
-        chunks = preprocess_pdf(path, chunk_size=300, overlap = 50)
-        chunks = generate_embeddings(chunks)
-        index = build_index(chunks)
-
-        save_index(index, chunks)
-        print("Index saved.")
-    else:
-        print("Existing index loaded.")
+    chunks = preprocess_pdf(path, chunk_size=400, overlap = 50)
+    chunks = generate_embeddings(chunks)
+    index = build_index(chunks)
     
-    
-    # while True:
-    #     query = input("Ask a question: ").strip()
-    #     if query.lower() == "exit":
-    #         break
+    query = "What are the two competing networks in a GAN?"
+    query_embedding = embedding_model.encode(query)
 
-    #     query_embedding = embedding_model.encode(query)
-    #     retrieved_chunks = search(index, query_embedding, chunks, k = 5)
-    #     prompt = build_prompt(query, retrieved_chunks)
+    result = debug_search(
+        index,
+        query_embedding,
+        chunks,
+        k=20
+    )
 
-    #     print("\nAnswer:")
-    #     answer = generate_answer(prompt)
-    #     print("\n")
+    for rank, item in enumerate(result, start=1):
+        chunk = item["chunk"]
 
-
-        evaluate_all(index, chunks, evaluation_data, k = 5)
+        print(f"\nRank {rank}")
+        print(f"Distance: {item['distance']:.4f}")
+        print(f"Page: {chunk['page']}")
+        print(f"Text: {chunk['text']}")
 
 
 if __name__ == "__main__":
