@@ -20,5 +20,3 @@ def generate_answer(prompt):
         answer += text
 
     return answer
-
-    

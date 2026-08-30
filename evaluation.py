@@ -1,5 +1,6 @@
 from faiss_store import search
 from model import embedding_model
+from reranker import rerank
 
 evaluation_data = [
   {
@@ -331,10 +332,16 @@ def evaluate_question(index, chunks, question, expected_pages, k):
         index,
         question_embedding,
         chunks,
-        k
+        k=20
     )
 
-    for rank, result in enumerate(retrieved_chunks, start=1):
+    reranked_chunks = rerank(
+        question,
+        retrieved_chunks,
+        top_k=k
+    )
+
+    for rank, result in enumerate(reranked_chunks, start=1):
         page = result["chunk"]["page"]
 
         if page in expected_pages:
@@ -371,4 +378,6 @@ def evaluate_all(index, chunks, evaluation_data, k):
 
         print("-" * 60)
 
-    return successful / len(evaluation_data) * 100
+    recall = successful / len(evaluation_data) * 100
+
+    return recall
