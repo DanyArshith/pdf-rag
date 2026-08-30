@@ -1,15 +1,19 @@
 from sentence_transformers import CrossEncoder
 
-reranker_model = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
 
-def rerank(query, results, top_k = 5):
-    pairs = []
+reranker_model = CrossEncoder(
+    "cross-encoder/ms-marco-MiniLM-L-6-v2"
+)
 
-    for result in results:
-        chunk = result['chunk']
-        pairs.append((query, chunk["text"]))
+
+def rerank(query, results, top_k=5):
+    pairs = [
+        (query, result["chunk"]["text"])
+        for result in results
+    ]
 
     scores = reranker_model.predict(pairs)
+
     reranked = []
 
     for result, score in zip(results, scores):

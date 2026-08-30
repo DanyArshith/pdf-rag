@@ -325,23 +325,32 @@ evaluation_data = [
   }
 ]
 
-def evaluate_question(index, chunks, question, expected_pages, k):
+def evaluate_question(
+    index,
+    chunks,
+    question,
+    expected_pages,
+    k,
+    rerank_top_n=20
+):
     question_embedding = embedding_model.encode(question)
 
-    retrieved_chunks = search(
+    candidates = search(
         index,
         question_embedding,
         chunks,
-        k=20
+        rerank_top_n
     )
 
-    reranked_chunks = rerank(
+    reranked_results = rerank(
         question,
-        retrieved_chunks,
-        top_k=k
+        candidates,
+        top_k=rerank_top_n
     )
 
-    for rank, result in enumerate(reranked_chunks, start=1):
+    final_results = reranked_results[:k]
+
+    for rank, result in enumerate(final_results, start=1):
         page = result["chunk"]["page"]
 
         if page in expected_pages:
@@ -350,34 +359,36 @@ def evaluate_question(index, chunks, question, expected_pages, k):
     return None
 
 
-def evaluate_all(index, chunks, evaluation_data, k):
+def evaluate_all(
+    index,
+    chunks,
+    evaluation_data,
+    k,
+    rerank_top_n=20
+):
     successful = 0
 
     for data in evaluation_data:
-        question = data["question"]
-        expected_pages = data["expected_pages"]
-
         rank = evaluate_question(
-            index,
-            chunks,
-            question,
-            expected_pages,
-            k
+            index=index,
+            chunks=chunks,
+            question=data["question"],
+            expected_pages=data["expected_pages"],
+            k=k,
+            rerank_top_n=rerank_top_n
         )
 
         if rank is not None:
             successful += 1
 
-        print(f"Question: {question}")
-        print(f"Expected pages: {expected_pages}")
+        print(f"Question: {data['question']}")
+        print(f"Expected pages: {data['expected_pages']}")
 
         if rank is not None:
             print(f"First relevant result: Rank {rank}")
         else:
             print("First relevant result: NOT FOUND")
 
-        print("-" * 60)
+        print()
 
-    recall = successful / len(evaluation_data) * 100
-
-    return recall
+    return (successful / len(evaluation_data)) * 100
